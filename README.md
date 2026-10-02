@@ -145,7 +145,7 @@ tooling. To try a change in an app before tagging it, `npm pack` here and
 `npm i -D <tarball>` there.
 
 Release: bump `version`, `npm run build`, commit (with `dist/`),
-`git tag vX.Y.Z && git push --follow-tags`, then bump the tag in each app.
+`git tag vX.Y.Z && git push origin main vX.Y.Z`, then bump the tag in each app.
 
 ## Remove it
 
