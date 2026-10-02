@@ -59,11 +59,11 @@ function pickLayer(): HTMLElement {
 }
 
 async function markElementWithNote(note: string): Promise<void> {
-  fireEvent.click(screen.getByRole('button', { name: /Mark a bug/ }));
+  fireEvent.click(screen.getByRole('button', { name: /Mark something/ }));
   fireEvent.pointerDown(pickLayer(), { clientX: 5, clientY: 5 });
   fireEvent.pointerUp(pickLayer(), { clientX: 5, clientY: 5 });
 
-  const textarea = await screen.findByRole('textbox', { name: 'Bug note' });
+  const textarea = await screen.findByRole('textbox', { name: 'Note' });
 
   fireEvent.change(textarea, { target: { value: note } });
   fireEvent.click(screen.getByRole('button', { name: /Add/ }));
@@ -93,7 +93,7 @@ describe('BugHuntOverlay', () => {
 
     const panel = openPanel();
 
-    expect(within(panel).getByText(/No bugs yet/)).toBeInTheDocument();
+    expect(within(panel).getByText(/Nothing marked yet/)).toBeInTheDocument();
     expect(within(panel).getByRole('button', { name: 'Save' })).toBeDisabled();
   });
 
@@ -125,7 +125,7 @@ describe('BugHuntOverlay', () => {
     renderHunt();
     openPanel();
 
-    fireEvent.click(screen.getByRole('button', { name: /Mark a bug/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Mark something/ }));
     fireEvent.keyDown(window, { key: 'Escape' });
 
     expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
@@ -135,7 +135,7 @@ describe('BugHuntOverlay', () => {
     fireEvent.pointerMove(pickLayer(), { clientX: 60, clientY: 90 });
     fireEvent.pointerUp(pickLayer(), { clientX: 60, clientY: 90 });
 
-    const textarea = await screen.findByRole('textbox', { name: 'Bug note' });
+    const textarea = await screen.findByRole('textbox', { name: 'Note' });
 
     fireEvent.change(textarea, { target: { value: 'Gap under the table' } });
     fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true });
@@ -169,7 +169,7 @@ describe('BugHuntOverlay', () => {
     await markElementWithNote('First wording');
     fireEvent.click(within(panel).getByRole('button', { name: 'Edit' }));
 
-    const textarea = screen.getByRole('textbox', { name: 'Bug note' });
+    const textarea = screen.getByRole('textbox', { name: 'Note' });
 
     expect(textarea).toHaveValue('First wording');
     fireEvent.change(textarea, { target: { value: 'Second wording' } });
@@ -179,8 +179,51 @@ describe('BugHuntOverlay', () => {
 
     fireEvent.click(within(panel).getByRole('button', { name: 'Delete' }));
 
-    expect(within(panel).getByText(/No bugs yet/)).toBeInTheDocument();
+    expect(within(panel).getByText(/Nothing marked yet/)).toBeInTheDocument();
     expect(storedSession().bugs).toEqual([]);
+  });
+
+  it('records a feature request, badges it, and lets an edit make it a bug', async () => {
+    renderHunt();
+    const panel = openPanel();
+
+    fireEvent.click(screen.getByRole('button', { name: /Mark something/ }));
+    fireEvent.pointerDown(pickLayer(), { clientX: 5, clientY: 5 });
+    fireEvent.pointerUp(pickLayer(), { clientX: 5, clientY: 5 });
+
+    const textarea = await screen.findByRole('textbox', { name: 'Note' });
+    const feature = screen.getByRole('button', { name: 'Feature' });
+
+    expect(screen.getByRole('button', { name: 'Bug' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    fireEvent.click(feature);
+    expect(feature).toHaveAttribute('aria-pressed', 'true');
+    expect(textarea).toHaveAttribute(
+      'placeholder',
+      'What should this do? Why would it help?'
+    );
+    fireEvent.change(textarea, { target: { value: 'Export members as CSV' } });
+    fireEvent.click(screen.getByRole('button', { name: /Add/ }));
+
+    expect(storedSession().bugs[0]).toMatchObject({ kind: 'feature' });
+    expect(within(panel).getByText('Feature')).toBeInTheDocument();
+    expect(within(panel).getByText('1 feature')).toBeInTheDocument();
+
+    fireEvent.click(within(panel).getByRole('button', { name: 'Edit' }));
+    expect(screen.getByRole('button', { name: 'Feature' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Bug' }));
+    fireEvent.click(screen.getByRole('button', { name: /Update/ }));
+
+    expect(storedSession().bugs[0]).toMatchObject({
+      kind: 'bug',
+      note: 'Export members as CSV',
+    });
+    expect(within(panel).getByText('1 bug')).toBeInTheDocument();
   });
 
   it('restores an unsaved session after a reload', () => {
@@ -195,7 +238,7 @@ describe('BugHuntOverlay', () => {
     ).toBeInTheDocument();
   });
 
-  it('saves to the board, clears the draft, and hands over /triage-bugs', async () => {
+  it('saves to the board, clears the draft, and hands over /triage-business-review', async () => {
     window.localStorage.setItem(
       DRAFT_STORAGE_KEY,
       JSON.stringify(makeSession())
@@ -213,7 +256,7 @@ describe('BugHuntOverlay', () => {
       data: {
         board: 'appointiq',
         folder: '/data/appointiq/bug-reports/2026-09-25-1430',
-        bugCount: 1,
+        counts: { bugs: 1, features: 0 },
       },
     });
     renderHunt();
@@ -226,9 +269,9 @@ describe('BugHuntOverlay', () => {
     expect(status).toHaveTextContent(
       '/data/appointiq/bug-reports/2026-09-25-1430'
     );
-    expect(status).toHaveTextContent('/triage-bugs');
+    expect(status).toHaveTextContent('/triage-business-review');
     expect(window.localStorage.getItem(DRAFT_STORAGE_KEY)).toBeNull();
-    expect(within(panel).getByText(/No bugs yet/)).toBeInTheDocument();
+    expect(within(panel).getByText(/Nothing marked yet/)).toBeInTheDocument();
   });
 
   it('keeps the draft and says why when a save fails', async () => {

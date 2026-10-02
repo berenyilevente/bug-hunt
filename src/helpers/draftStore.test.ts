@@ -25,6 +25,17 @@ describe('draftStore', () => {
     expect(readDraft()).toBeNull();
   });
 
+  it('reads a draft from before items had a kind back as bugs', () => {
+    const { kind: _kind, ...withoutKind } = makeBug();
+
+    window.localStorage.setItem(
+      DRAFT_STORAGE_KEY,
+      JSON.stringify({ ...makeSession(), bugs: [withoutKind] })
+    );
+
+    expect(readDraft()?.bugs).toEqual([makeBug()]);
+  });
+
   it('ignores corrupt or foreign data', () => {
     window.localStorage.setItem(DRAFT_STORAGE_KEY, '{not json');
     expect(readDraft()).toBeNull();

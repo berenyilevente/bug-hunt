@@ -14,14 +14,31 @@ function report(bugs: ReportSession['bugs']): string {
 }
 
 describe('renderReport', () => {
-  it('writes the frontmatter /triage-bugs reads, with status new', () => {
+  it('writes the frontmatter /triage-business-review reads, with status new', () => {
     const markdown = report([{ ...makeBug(), screenshot: 'shots/01.jpg' }]);
 
     expect(
       markdown.startsWith('---\nboard: appointiq\nrepo: /repos/appointiq-app\n')
     ).toBe(true);
-    expect(markdown).toContain('\nstatus: new\nbugs: 1\n---\n');
+    expect(markdown).toContain('\nstatus: new\nbugs: 1\nfeatures: 0\n---\n');
     expect(markdown).toContain('# Bug hunt — 2026-09-25-1430');
+  });
+
+  it('heads each item by its kind, in one sequence, and counts both kinds', () => {
+    const markdown = report([
+      { ...makeBug(), screenshot: 'shots/01.jpg' },
+      { ...makeBug({ id: 'b', kind: 'feature' }), screenshot: 'shots/02.jpg' },
+      { ...makeBug({ id: 'c' }), screenshot: null },
+    ]);
+
+    expect(markdown).toContain('\nbugs: 2\nfeatures: 1\n---\n');
+    expect(markdown.match(/^## .+$/gm)).toEqual([
+      '## Bug 1',
+      '## Feature 2',
+      '## Bug 3',
+    ]);
+    expect(markdown).toContain('## Feature 2\n\n- **Page:**');
+    expect(markdown).toContain('- **Screenshot:** shots/02.jpg');
   });
 
   it('writes each bug with its page, anchor, components, screenshot and an empty outcome', () => {

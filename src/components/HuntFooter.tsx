@@ -2,7 +2,8 @@
 
 import type { ReactNode } from 'react';
 
-import { bugCountLabel, LABELS } from '../helpers/labels.js';
+import { itemCountLabel, LABELS } from '../helpers/labels.js';
+import { countKinds } from '../helpers/counts.js';
 import { useBugHunt } from '../hooks/use-bug-hunt.js';
 import { SavedNotice } from './SavedNotice.js';
 
@@ -21,7 +22,7 @@ export function HuntFooter(): ReactNode {
       )}
       <div className="flex items-center gap-2">
         <span className="mr-auto text-xs text-zinc-500">
-          {hasBugs && bugCountLabel(bugs.length)}
+          {hasBugs && itemCountLabel(countKinds(bugs))}
         </span>
         <button
           type="button"

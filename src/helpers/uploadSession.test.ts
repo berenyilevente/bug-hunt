@@ -26,7 +26,11 @@ beforeEach(() => {
   );
   finishBugReport.mockResolvedValue({
     status: 'success',
-    data: { board: 'appointiq', folder: '/x', bugCount: 2 },
+    data: {
+      board: 'appointiq',
+      folder: '/x',
+      counts: { bugs: 2, features: 0 },
+    },
   });
 });
 

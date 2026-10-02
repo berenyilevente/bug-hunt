@@ -37,9 +37,16 @@ export type PageSignals = {
   failedRequests: FailedRequest[];
 };
 
-/** One reported bug. `screenshot` is a JPEG data URL, or null when capture failed. */
+/** What the reporter says an item is. Triage has the final say. */
+export type ItemKind = 'bug' | 'feature';
+
+/**
+ * One reported item — a bug or a feature request. `screenshot` is a JPEG data
+ * URL, or null when capture failed.
+ */
 export type Bug = PageSignals & {
   id: string;
+  kind: ItemKind;
   url: string;
   pathname: string;
   mark: Mark;
@@ -69,7 +76,14 @@ export type HuntResult<T> =
   | { status: 'success'; data: T }
   | { status: 'error'; reason: HuntFailure; detail?: string };
 
-export type SavedReport = { board: string; folder: string; bugCount: number };
+/** Counts per kind, as the report's frontmatter records them. */
+export type ItemCounts = { bugs: number; features: number };
+
+export type SavedReport = {
+  board: string;
+  folder: string;
+  counts: ItemCounts;
+};
 
 /**
  * The three steps a save takes, as the browser calls them. A seam rather than

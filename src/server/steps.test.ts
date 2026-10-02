@@ -66,11 +66,46 @@ describe('bug hunt save steps', () => {
 
     expect(finished).toEqual({
       status: 'success',
-      data: { board: 'appointiq', folder: folderPath, bugCount: 1 },
+      data: {
+        board: 'appointiq',
+        folder: folderPath,
+        counts: { bugs: 1, features: 0 },
+      },
     });
     expect(
       await readFile(path.join(folderPath, 'report.md'), 'utf8')
     ).toContain('board: appointiq');
+  });
+
+  it('write a feature request as a feature, and count it', async () => {
+    const begun = await beginBugReport();
+
+    if (begun.status !== 'success') {
+      throw new Error('begin failed');
+    }
+
+    const finished = await finishBugReport(begun.data.folder, {
+      startedAt: '2026-09-25T12:00:00.000Z',
+      bugs: [{ ...makeBug({ kind: 'feature' }), screenshot: null }],
+    });
+
+    expect(finished).toMatchObject({
+      data: { counts: { bugs: 0, features: 1 } },
+    });
+
+    const markdown = await readFile(
+      path.join(
+        data,
+        'appointiq',
+        'bug-reports',
+        begun.data.folder,
+        'report.md'
+      ),
+      'utf8'
+    );
+
+    expect(markdown).toContain('## Feature 1');
+    expect(markdown).not.toContain('## Bug');
   });
 
   it('refuse a folder path, a bad number and a non-JPEG image', async () => {

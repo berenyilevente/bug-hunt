@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { locateBoard } from './boardLocator.js';
-/** The folder inside a board a hunt is saved to, where `/triage-bugs` looks. */
+/** The folder inside a board a hunt is saved to, where `/triage-business-review` looks. */
 const REPORTS_DIR = 'bug-reports';
 /**
  * Pins the board to save to, by its slug (its directory under `data/`). Unset,

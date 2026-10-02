@@ -1,4 +1,5 @@
-import type { Mark, ReportBug, ReportSession } from './types.js';
+import { countKinds } from './counts.js';
+import type { ItemKind, Mark, ReportBug, ReportSession } from './types.js';
 
 type ReportMeta = { board: string; repo: string; created: Date };
 
@@ -69,9 +70,11 @@ function describeMark(mark: Mark): string {
   return `element ${code(mark.selector)}${text}`;
 }
 
+const HEADINGS: Record<ItemKind, string> = { bug: 'Bug', feature: 'Feature' };
+
 function renderBug(bug: ReportBug, number: number): string {
   const lines = [
-    `## Bug ${number}`,
+    `## ${HEADINGS[bug.kind]} ${number}`,
     '',
     `- **Page:** ${bug.pathname} — ${bug.url}`,
     `- **Marked:** ${describeMark(bug.mark)}`,
@@ -111,11 +114,14 @@ function renderBug(bug: ReportBug, number: number): string {
 }
 
 /**
- * The report `/triage-bugs` reads. The frontmatter's `status` is what it flips
- * to `triaged`, and each bug's `Outcome` line is what it fills in — so both are
- * written here, empty, in the shape the skill expects.
+ * The report `/triage-business-review` reads. Items are `## Bug N` or
+ * `## Feature N`, numbered in one sequence that matches `shots/NN.jpg`. The
+ * frontmatter's `status` is what triage flips to `triaged`, and each item's
+ * `Outcome` line is what it fills in — so both are written here, empty, in the
+ * shape the skill expects.
  */
 export function renderReport(session: ReportSession, meta: ReportMeta): string {
+  const counts = countKinds(session.bugs);
   const header = [
     '---',
     `board: ${meta.board}`,
@@ -123,7 +129,8 @@ export function renderReport(session: ReportSession, meta: ReportMeta): string {
     `created: ${localIso(meta.created)}`,
     `started: ${session.startedAt}`,
     'status: new',
-    `bugs: ${session.bugs.length}`,
+    `bugs: ${counts.bugs}`,
+    `features: ${counts.features}`,
     '---',
     '',
     `# Bug hunt — ${folderStamp(meta.created)}`,

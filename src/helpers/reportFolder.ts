@@ -57,7 +57,7 @@ export async function hasFile(folder: string, file: string): Promise<boolean> {
 
 /**
  * Writes `report.md` last, through a temp file renamed over it: a folder with
- * a report in it is a finished one, which is all `/triage-bugs` looks for.
+ * a report in it is a finished one, which is all `/triage-business-review` looks for.
  */
 export async function writeReportFile(
   folder: string,

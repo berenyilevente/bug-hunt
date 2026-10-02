@@ -3,12 +3,13 @@
 import { useState, type KeyboardEvent, type ReactNode } from 'react';
 
 import { toViewportBox } from '../helpers/geometry.js';
-import { LABELS } from '../helpers/labels.js';
-import type { Rect } from '../helpers/types.js';
+import { LABELS, NOTE_PLACEHOLDERS } from '../helpers/labels.js';
+import type { ItemKind, Rect } from '../helpers/types.js';
 import { useBugHunt } from '../hooks/use-bug-hunt.js';
+import { KindToggle } from './KindToggle.js';
 
 const FORM_WIDTH = 320;
-const FORM_HEIGHT = 190;
+const FORM_HEIGHT = 226;
 const GAP = 8;
 
 /**
@@ -32,19 +33,26 @@ function placeNear(rect: Rect): { top: number; left: number } {
 
 type NoteCardProps = {
   initialNote: string;
+  initialKind: ItemKind;
   rect: Rect | null;
   isEdit: boolean;
 };
 
-function NoteCard({ initialNote, rect, isEdit }: NoteCardProps): ReactNode {
+function NoteCard({
+  initialNote,
+  initialKind,
+  rect,
+  isEdit,
+}: NoteCardProps): ReactNode {
   const { submitNote, closeNote } = useBugHunt();
   const [note, setNote] = useState(initialNote);
+  const [kind, setKind] = useState(initialKind);
   const position = rect ? placeNear(rect) : null;
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>): void => {
     if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
       event.preventDefault();
-      submitNote(note);
+      submitNote(note, kind);
       return;
     }
 
@@ -58,18 +66,19 @@ function NoteCard({ initialNote, rect, isEdit }: NoteCardProps): ReactNode {
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        submitNote(note);
+        submitNote(note, kind);
       }}
       className={`fixed z-[2147483001] flex w-80 flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-3 font-sans text-zinc-900 shadow-2xl ${position ? '' : 'left-1/2 top-1/3 -translate-x-1/2'}`}
       // Placed next to a measured mark — the one inline style.
       style={position ?? undefined}
     >
+      <KindToggle kind={kind} onChange={setKind} />
       <textarea
         aria-label={LABELS.noteLabel}
         value={note}
         onChange={(event) => setNote(event.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={LABELS.notePlaceholder}
+        placeholder={NOTE_PLACEHOLDERS[kind]}
         rows={4}
         autoFocus
         className="w-full resize-none rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-500"
@@ -109,6 +118,7 @@ export function NoteForm(): ReactNode {
       <NoteCard
         key={editingBug.id}
         initialNote={editingBug.note}
+        initialKind={editingBug.kind}
         rect={null}
         isEdit
       />
@@ -120,6 +130,7 @@ export function NoteForm(): ReactNode {
       <NoteCard
         key={pending.markedAt}
         initialNote=""
+        initialKind="bug"
         rect={pending.mark.rect}
         isEdit={false}
       />

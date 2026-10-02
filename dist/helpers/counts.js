@@ -1,0 +1,7 @@
+/** How many items of each kind a session holds. */
+export function countKinds(items) {
+    return {
+        bugs: items.filter((item) => item.kind === 'bug').length,
+        features: items.filter((item) => item.kind === 'feature').length,
+    };
+}

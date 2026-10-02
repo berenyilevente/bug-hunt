@@ -14,6 +14,31 @@ export function newSession(now: Date = new Date()): HuntSession {
   return { startedAt: now.toISOString(), bugs: [] };
 }
 
+/**
+ * A draft saved before items had a kind holds only bugs: it reads back as
+ * such rather than being thrown away on upgrade.
+ */
+function withKinds(value: unknown): unknown {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    !Array.isArray((value as { bugs?: unknown }).bugs)
+  ) {
+    return value;
+  }
+
+  const session = value as { bugs: unknown[] };
+
+  return {
+    ...session,
+    bugs: session.bugs.map((bug) =>
+      typeof bug === 'object' && bug !== null && !('kind' in bug)
+        ? { ...bug, kind: 'bug' }
+        : bug
+    ),
+  };
+}
+
 /** The unsaved session left by an earlier page load, or `null` for none. */
 export function readDraft(): HuntSession | null {
   try {
@@ -23,7 +48,7 @@ export function readDraft(): HuntSession | null {
       return null;
     }
 
-    const parsed: unknown = JSON.parse(stored);
+    const parsed = withKinds(JSON.parse(stored));
 
     return isHuntSession(parsed) ? parsed : null;
   } catch {

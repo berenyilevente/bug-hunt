@@ -26,7 +26,7 @@ export function SavedNotice({ report }: SavedNoticeProps): ReactNode {
       className="flex flex-col gap-1 rounded-md bg-emerald-50 p-2 text-xs text-emerald-900"
     >
       <p>
-        {savedLabel(report.bugCount)}{' '}
+        {savedLabel(report.counts)}{' '}
         <code className="break-all font-mono">{report.folder}</code>
       </p>
       <p>{LABELS.nextStep}</p>

@@ -1,11 +1,13 @@
 # Bug hunt
 
-An overlay for reporting bugs from inside a Next.js app, on only when
-`NEXT_PUBLIC_BUG_HUNT=true`. You click through the app and mark each bug as
-you find it. Clicking an element or dragging a box over an area opens a note.
-At the end, one **Save** writes the whole session as a markdown report into the
-app's disposit board. `/triage-bugs` in Claude Code then turns that report into
-fix tickets.
+An overlay for reporting bugs and feature requests from inside a Next.js app,
+on only when `NEXT_PUBLIC_BUG_HUNT=true`. You click through the app and mark
+each bug, or each place a feature should go, as you find it. Clicking an
+element or dragging a box over an area opens a note. At the end, one **Save**
+writes the whole session as a markdown report into the app's disposit board.
+`/triage-business-review` in Claude Code then sorts that report into bugs,
+which it files as fix tickets, and feature requests, which it plans through
+`/plan-board`.
 
 The flag is the only gate, in development and production alike. A build
 without it compiles the overlay out, and the save route answers 404. A build
@@ -19,7 +21,7 @@ It expects Next.js App Router (15+), React 19 and a disposit board for the app.
 It needs nothing from the app's Tailwind or CSS.
 
 ```bash
-npm i -D github:berenyilevente/bug-hunt#v0.1.1
+npm i -D github:berenyilevente/bug-hunt#v0.2.0
 npx bug-hunt setup
 ```
 
@@ -55,7 +57,7 @@ the request through untouched.
 1. Set `NEXT_PUBLIC_BUG_HUNT=true` in `.env.local`.
 2. Run `npm run dev`, then press **⌥⇧B** or click the **bugs** pill in the
    bottom-right corner.
-3. Press **Mark a bug** (or **⌥⇧M**). The page is covered by a pick layer:
+3. Press **Mark something** (or **⌥⇧M**). The page is covered by a pick layer:
    - **Click** an element to mark it. The report records a selector for it,
      its text and the React components that rendered it.
    - **Drag** a box over something that isn't a single element, such as a gap,
@@ -64,25 +66,28 @@ the request through untouched.
 
    This works over an open dialog, sheet or menu too, and leaves it open.
 
-4. Write a note: what is wrong, and what you expected. Save it with ⌘↵. The
-   overlay adds:
+4. Pick **Bug** or **Feature** at the top of the note card (Bug by default),
+   then write the note: for a bug, what is wrong and what you expected; for a
+   feature, what it should do and why it would help. Save it with ⌘↵. Editing
+   an item can change its kind too. The overlay adds:
    - a screenshot of the viewport with the mark outlined in red
    - the console errors and failed `fetch` calls (server actions included) that
      page logged
 5. Keep going across as many pages as you like. The session survives reloads
    and locale switches, because it is kept in `localStorage` until you save or
-   discard it. Hovering a bug in the panel outlines it again when you are on
+   discard it. Hovering an item in the panel outlines it again when you are on
    its page.
 6. **Save**. The panel shows the folder the report went to and the command to
-   run next: `/triage-bugs`.
+   run next: `/triage-business-review`.
 
 ## Where it saves
 
 Save writes to `<DATA>/<board>/bug-reports/<YYYY-MM-DD-HHmm>/`:
 
 ```
-report.md      frontmatter (board, repo, status: new) + one "## Bug N" section per bug
-shots/01.jpg   one screenshot per bug that has one, numbered like the report
+report.md      frontmatter (board, repo, status: new, bugs: N, features: N)
+               + one "## Bug N" or "## Feature N" section per item, numbered in one sequence
+shots/01.jpg   one screenshot per item that has one, numbered like the report
 ```
 
 `<DATA>` is disposit's `data/` directory, found the way disposit's own skills
@@ -93,8 +98,11 @@ board's directory name to pick one yourself. If no board matches, the pill
 turns amber, the panel says why and Save is disabled. Your session stays in
 `localStorage`, so nothing is lost.
 
-`/triage-bugs` reads the newest report whose `status` isn't `triaged`. It fills
-in each bug's `Outcome:` line and then sets `status: triaged`.
+`/triage-business-review` reads the newest report whose `status` isn't
+`triaged`. It has the final say on each item's kind, fills in each item's
+`Outcome:` line, and sets `status: triaged` once every item has one. Reports
+from before feature requests, with only `## Bug N` sections, read the same
+way.
 
 ## How it works
 
@@ -119,7 +127,7 @@ in each bug's `Outcome:` line and then sets `status: triaged`.
   screenshot, and one to write `report.md`. Each request takes a folder _name_
   and re-resolves the board, so nothing the browser sends can point a write
   elsewhere. `report.md` is written last, so a folder without it is an
-  interrupted save that `/triage-bugs` never reads.
+  interrupted save that `/triage-business-review` never reads.
 - Screenshots are `modern-screenshot` renders of the document, cropped to the
   viewport and scaled to ≤1280px JPEG. Anything under `[data-dev-overlay]` is
   left out. When a page can't be drawn (a tainted canvas, a cross-origin

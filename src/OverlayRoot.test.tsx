@@ -111,7 +111,7 @@ describe('OverlayRoot over an open dialog', () => {
     fireEvent.pointerUp(layer, { clientX: 5, clientY: 5 });
 
     const textarea = await overlay().findByRole('textbox', {
-      name: 'Bug note',
+      name: 'Note',
       ...HIDDEN,
     });
 
@@ -147,14 +147,14 @@ describe('OverlayRoot over an open dialog', () => {
     fireEvent.pointerUp(layer, { clientX: 5, clientY: 5 });
 
     const textarea = await overlay().findByRole('textbox', {
-      name: 'Bug note',
+      name: 'Note',
       ...HIDDEN,
     });
 
     fireEvent.keyDown(textarea, { key: 'Escape' });
 
     expect(
-      overlay().queryByRole('textbox', { name: 'Bug note', ...HIDDEN })
+      overlay().queryByRole('textbox', { name: 'Note', ...HIDDEN })
     ).not.toBeInTheDocument();
     expect(dialog()).toBeInTheDocument();
   });

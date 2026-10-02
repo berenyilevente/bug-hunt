@@ -4,6 +4,6 @@ type BugRowProps = {
     bug: Bug;
     number: number;
 };
-/** One bug: its screenshot, page and note, with edit and delete. */
+/** One item: its kind, screenshot, page and note, with edit and delete. */
 export declare function BugRow({ bug, number }: BugRowProps): ReactNode;
 export {};

@@ -6,6 +6,7 @@ import {
   isReportSession,
   isScreenshotDataUrl,
 } from '../helpers/guards.js';
+import { countKinds } from '../helpers/counts.js';
 import { renderReport } from '../helpers/renderReport.js';
 import {
   createReportFolder,
@@ -142,7 +143,7 @@ export async function finishBugReport(
     return succeed({
       board: target.board,
       folder: folderPath,
-      bugCount: session.bugs.length,
+      counts: countKinds(session.bugs),
     });
   } catch (error) {
     console.error('[bug-hunt]', error);

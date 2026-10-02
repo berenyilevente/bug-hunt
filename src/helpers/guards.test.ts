@@ -44,6 +44,25 @@ describe('isHuntSession', () => {
     ).toBe(false);
     expect(isHuntSession({ bugs: [] })).toBe(false);
   });
+
+  it('takes a bug or a feature, and nothing else or nothing at all', () => {
+    expect(isHuntSession(makeSession([makeBug({ kind: 'feature' })]))).toBe(
+      true
+    );
+    expect(
+      isHuntSession(
+        makeSession([
+          makeBug({
+            kind: 'idea' as unknown as ReturnType<typeof makeBug>['kind'],
+          }),
+        ])
+      )
+    ).toBe(false);
+
+    const { kind: _kind, ...withoutKind } = makeBug();
+
+    expect(isHuntSession({ startedAt: 'x', bugs: [withoutKind] })).toBe(false);
+  });
 });
 
 describe('isReportSession', () => {

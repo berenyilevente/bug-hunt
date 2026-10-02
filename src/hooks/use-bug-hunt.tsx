@@ -24,6 +24,7 @@ import type {
   Bug,
   HuntSession,
   HuntTarget,
+  ItemKind,
   Mark,
   PageSignals,
   SavedReport,
@@ -127,7 +128,7 @@ function useHuntValue({ target, steps }: HuntProps) {
     setEditingId(null);
   };
 
-  const submitNote = (note: string): void => {
+  const submitNote = (note: string, kind: ItemKind): void => {
     const trimmed = note.trim();
 
     if (trimmed === '') {
@@ -138,7 +139,7 @@ function useHuntValue({ target, steps }: HuntProps) {
       updateSession({
         ...session,
         bugs: session.bugs.map((bug) =>
-          bug.id === editingBug.id ? { ...bug, note: trimmed } : bug
+          bug.id === editingBug.id ? { ...bug, note: trimmed, kind } : bug
         ),
       });
       closeNote();
@@ -149,7 +150,12 @@ function useHuntValue({ target, steps }: HuntProps) {
       return;
     }
 
-    const bug: Bug = { id: crypto.randomUUID(), note: trimmed, ...pending };
+    const bug: Bug = {
+      id: crypto.randomUUID(),
+      kind,
+      note: trimmed,
+      ...pending,
+    };
 
     updateSession({ ...session, bugs: [...session.bugs, bug] });
     closeNote();

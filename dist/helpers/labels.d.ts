@@ -1,4 +1,4 @@
-import type { HuntFailure } from './types.js';
+import type { HuntFailure, ItemCounts, ItemKind } from './types.js';
 /**
  * Every word the overlay shows. Deliberately not in `messages/`: this is
  * developer tooling that is never shipped. Held here rather than inline so the
@@ -10,18 +10,18 @@ export declare const LABELS: {
     readonly pillTitle: "Toggle the bug hunt (⌥⇧B)";
     readonly panelTitle: "Bug hunt";
     readonly close: "Close";
-    readonly mark: "Mark a bug";
+    readonly mark: "Mark something";
     readonly markShortcut: "⌥⇧M";
     readonly picking: "Click an element, or drag a box. Esc cancels.";
     readonly capturing: "Capturing…";
     readonly save: "Save";
     readonly saving: "Saving…";
     readonly discardSession: "Discard session";
-    readonly empty: "No bugs yet. Mark one on the page.";
+    readonly empty: "Nothing marked yet. Mark a bug or a feature idea on the page.";
     readonly edit: "Edit";
     readonly delete: "Delete";
-    readonly notePlaceholder: "What is wrong here? What did you expect?";
-    readonly noteLabel: "Bug note";
+    readonly noteLabel: "Note";
+    readonly kindLabel: "Kind";
     readonly noteSave: "Add";
     readonly noteUpdate: "Update";
     readonly noteCancel: "Cancel";
@@ -29,13 +29,18 @@ export declare const LABELS: {
     readonly noBoard: "Save has nowhere to go:";
     readonly storageWarning: "The browser storage is full: screenshots will not survive a reload until you save.";
     readonly nextStep: "Now run this in Claude Code, from this repo:";
-    readonly triageCommand: "/triage-bugs";
+    readonly triageCommand: "/triage-business-review";
     readonly copy: "Copy";
     readonly copied: "Copied";
     readonly noScreenshot: "no image";
 };
-export declare function bugCountLabel(count: number): string;
-export declare function savedLabel(count: number): string;
+/** What each kind is called, on the toggle and the row badge. */
+export declare const KIND_LABELS: Record<ItemKind, string>;
+/** The note's prompt, per kind: a bug and a feature ask for different things. */
+export declare const NOTE_PLACEHOLDERS: Record<ItemKind, string>;
+/** `2 bugs · 1 feature` — a kind with none is left out. */
+export declare function itemCountLabel({ bugs, features }: ItemCounts): string;
+export declare function savedLabel(counts: ItemCounts): string;
 export declare function signalCountLabel(count: number): string;
 export declare function failureLabel(reason: HuntFailure, detail?: string): string;
 /** Where the unsaved session lives between reloads, per browser. */

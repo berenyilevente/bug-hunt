@@ -3,6 +3,24 @@ import { DRAFT_STORAGE_KEY } from './labels.js';
 export function newSession(now = new Date()) {
     return { startedAt: now.toISOString(), bugs: [] };
 }
+/**
+ * A draft saved before items had a kind holds only bugs: it reads back as
+ * such rather than being thrown away on upgrade.
+ */
+function withKinds(value) {
+    if (typeof value !== 'object' ||
+        value === null ||
+        !Array.isArray(value.bugs)) {
+        return value;
+    }
+    const session = value;
+    return {
+        ...session,
+        bugs: session.bugs.map((bug) => typeof bug === 'object' && bug !== null && !('kind' in bug)
+            ? { ...bug, kind: 'bug' }
+            : bug),
+    };
+}
 /** The unsaved session left by an earlier page load, or `null` for none. */
 export function readDraft() {
     try {
@@ -10,7 +28,7 @@ export function readDraft() {
         if (stored === null) {
             return null;
         }
-        const parsed = JSON.parse(stored);
+        const parsed = withKinds(JSON.parse(stored));
         return isHuntSession(parsed) ? parsed : null;
     }
     catch {

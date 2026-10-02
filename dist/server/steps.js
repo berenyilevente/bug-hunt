@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { isBugNumber, isFolderName, isReportSession, isScreenshotDataUrl, } from '../helpers/guards.js';
+import { countKinds } from '../helpers/counts.js';
 import { renderReport } from '../helpers/renderReport.js';
 import { createReportFolder, hasFile, writeReportFile, writeScreenshot, } from '../helpers/reportFolder.js';
 import { fail, FAILURE, succeed } from '../helpers/results.js';
@@ -90,7 +91,7 @@ export async function finishBugReport(folder, session) {
         return succeed({
             board: target.board,
             folder: folderPath,
-            bugCount: session.bugs.length,
+            counts: countKinds(session.bugs),
         });
     }
     catch (error) {

@@ -11,9 +11,11 @@ export declare function localIso(date: Date): string;
 /** The screenshot file of the bug numbered `number`, relative to the report. */
 export declare function shotFileName(number: number): string;
 /**
- * The report `/triage-bugs` reads. The frontmatter's `status` is what it flips
- * to `triaged`, and each bug's `Outcome` line is what it fills in — so both are
- * written here, empty, in the shape the skill expects.
+ * The report `/triage-business-review` reads. Items are `## Bug N` or
+ * `## Feature N`, numbered in one sequence that matches `shots/NN.jpg`. The
+ * frontmatter's `status` is what triage flips to `triaged`, and each item's
+ * `Outcome` line is what it fills in — so both are written here, empty, in the
+ * shape the skill expects.
  */
 export declare function renderReport(session: ReportSession, meta: ReportMeta): string;
 export {};

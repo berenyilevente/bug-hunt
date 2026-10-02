@@ -5,10 +5,11 @@ import type { ReactNode } from 'react';
 import { LABELS, signalCountLabel } from '../helpers/labels.js';
 import type { Bug } from '../helpers/types.js';
 import { useBugHunt } from '../hooks/use-bug-hunt.js';
+import { KindBadge } from './KindBadge.js';
 
 type BugRowProps = { bug: Bug; number: number };
 
-/** One bug: its screenshot, page and note, with edit and delete. */
+/** One item: its kind, screenshot, page and note, with edit and delete. */
 export function BugRow({ bug, number }: BugRowProps): ReactNode {
   const { startEdit, deleteBug, setHoveredBugId } = useBugHunt();
   const signalCount = bug.consoleErrors.length + bug.failedRequests.length;
@@ -35,6 +36,7 @@ export function BugRow({ bug, number }: BugRowProps): ReactNode {
       <div className="min-w-0 flex-1">
         <p className="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
           <span>#{number}</span>
+          <KindBadge kind={bug.kind} />
           <span className="truncate">{bug.pathname}</span>
           {signalCount > 0 && (
             <span className="shrink-0 rounded bg-red-100 px-1 text-red-700">

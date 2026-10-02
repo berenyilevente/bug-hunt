@@ -28,6 +28,9 @@ function isMark(value) {
     }
     return (value.kind === 'element' && isString(value.selector) && isString(value.text));
 }
+function isItemKind(value) {
+    return value === 'bug' || value === 'feature';
+}
 function isConsoleError(value) {
     return isObject(value) && isString(value.message);
 }
@@ -40,6 +43,7 @@ function isFailedRequest(value) {
 /** Everything a bug carries but its screenshot, which the two forms type apart. */
 function isBugBody(value) {
     return (isObject(value) &&
+        isItemKind(value.kind) &&
         [value.id, value.url, value.pathname, value.note, value.markedAt].every(isString) &&
         value.note.trim() !== '' &&
         isMark(value.mark) &&

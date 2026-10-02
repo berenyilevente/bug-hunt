@@ -72,7 +72,7 @@ function useHuntValue({ target, steps }) {
         setPending(null);
         setEditingId(null);
     };
-    const submitNote = (note) => {
+    const submitNote = (note, kind) => {
         const trimmed = note.trim();
         if (trimmed === '') {
             return;
@@ -80,7 +80,7 @@ function useHuntValue({ target, steps }) {
         if (editingBug) {
             updateSession({
                 ...session,
-                bugs: session.bugs.map((bug) => bug.id === editingBug.id ? { ...bug, note: trimmed } : bug),
+                bugs: session.bugs.map((bug) => bug.id === editingBug.id ? { ...bug, note: trimmed, kind } : bug),
             });
             closeNote();
             return;
@@ -88,7 +88,12 @@ function useHuntValue({ target, steps }) {
         if (!pending) {
             return;
         }
-        const bug = { id: crypto.randomUUID(), note: trimmed, ...pending };
+        const bug = {
+            id: crypto.randomUUID(),
+            kind,
+            note: trimmed,
+            ...pending,
+        };
         updateSession({ ...session, bugs: [...session.bugs, bug] });
         closeNote();
     };

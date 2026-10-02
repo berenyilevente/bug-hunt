@@ -6,6 +6,7 @@ export const JPEG = 'data:image/jpeg;base64,/9j/4AAQSkZJRg==';
 export function makeBug(overrides: Partial<Bug> = {}): Bug {
   return {
     id: 'bug-1',
+    kind: 'bug',
     url: 'http://localhost:3000/en/members',
     pathname: '/en/members',
     mark: {

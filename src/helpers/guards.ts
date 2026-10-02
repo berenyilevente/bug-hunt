@@ -1,5 +1,6 @@
 import type {
   Bug,
+  ItemKind,
   ConsoleError,
   FailedRequest,
   HuntSession,
@@ -58,6 +59,10 @@ function isMark(value: unknown): value is Mark {
   );
 }
 
+function isItemKind(value: unknown): value is ItemKind {
+  return value === 'bug' || value === 'feature';
+}
+
 function isConsoleError(value: unknown): value is ConsoleError {
   return isObject(value) && isString(value.message);
 }
@@ -75,6 +80,7 @@ function isFailedRequest(value: unknown): value is FailedRequest {
 function isBugBody(value: unknown): value is Fields {
   return (
     isObject(value) &&
+    isItemKind(value.kind) &&
     [value.id, value.url, value.pathname, value.note, value.markedAt].every(
       isString
     ) &&

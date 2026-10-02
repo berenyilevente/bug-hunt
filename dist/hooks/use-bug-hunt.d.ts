@@ -1,4 +1,4 @@
-import type { Bug, HuntTarget, Mark, PageSignals, SavedReport, SaveSteps } from '../helpers/types.js';
+import type { Bug, HuntTarget, ItemKind, Mark, PageSignals, SavedReport, SaveSteps } from '../helpers/types.js';
 type HuntProps = {
     target: HuntTarget;
     steps: SaveSteps;
@@ -29,7 +29,7 @@ export declare const useBugHunt: () => {
     completeMark: (mark: Mark) => Promise<void>;
     pending: PendingBug | null;
     editingBug: Bug | null;
-    submitNote: (note: string) => void;
+    submitNote: (note: string, kind: ItemKind) => void;
     closeNote: () => void;
     startEdit: (id: string) => void;
     deleteBug: (id: string) => void;

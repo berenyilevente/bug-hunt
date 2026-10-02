@@ -1,6 +1,6 @@
 {
   "name": "@berenyilevente/bug-hunt",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A dev overlay for marking bugs on a Next.js page and saving them as a report to a disposit board.",
   "private": true,
   "type": "module",

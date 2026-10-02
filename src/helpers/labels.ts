@@ -1,4 +1,4 @@
-import type { HuntFailure } from './types.js';
+import type { HuntFailure, ItemCounts, ItemKind } from './types.js';
 
 /**
  * Every word the overlay shows. Deliberately not in `messages/`: this is
@@ -11,18 +11,18 @@ export const LABELS = {
   pillTitle: 'Toggle the bug hunt (⌥⇧B)',
   panelTitle: 'Bug hunt',
   close: 'Close',
-  mark: 'Mark a bug',
+  mark: 'Mark something',
   markShortcut: '⌥⇧M',
   picking: 'Click an element, or drag a box. Esc cancels.',
   capturing: 'Capturing…',
   save: 'Save',
   saving: 'Saving…',
   discardSession: 'Discard session',
-  empty: 'No bugs yet. Mark one on the page.',
+  empty: 'Nothing marked yet. Mark a bug or a feature idea on the page.',
   edit: 'Edit',
   delete: 'Delete',
-  notePlaceholder: 'What is wrong here? What did you expect?',
-  noteLabel: 'Bug note',
+  noteLabel: 'Note',
+  kindLabel: 'Kind',
   noteSave: 'Add',
   noteUpdate: 'Update',
   noteCancel: 'Cancel',
@@ -31,18 +31,40 @@ export const LABELS = {
   storageWarning:
     'The browser storage is full: screenshots will not survive a reload until you save.',
   nextStep: 'Now run this in Claude Code, from this repo:',
-  triageCommand: '/triage-bugs',
+  triageCommand: '/triage-business-review',
   copy: 'Copy',
   copied: 'Copied',
   noScreenshot: 'no image',
 } as const;
 
-export function bugCountLabel(count: number): string {
-  return count === 1 ? '1 bug' : `${count} bugs`;
+/** What each kind is called, on the toggle and the row badge. */
+export const KIND_LABELS: Record<ItemKind, string> = {
+  bug: 'Bug',
+  feature: 'Feature',
+};
+
+/** The note's prompt, per kind: a bug and a feature ask for different things. */
+export const NOTE_PLACEHOLDERS: Record<ItemKind, string> = {
+  bug: 'What is wrong here? What did you expect?',
+  feature: 'What should this do? Why would it help?',
+};
+
+function plural(count: number, one: string, many: string): string {
+  return `${count} ${count === 1 ? one : many}`;
 }
 
-export function savedLabel(count: number): string {
-  return `${bugCountLabel(count)} saved to`;
+/** `2 bugs · 1 feature` — a kind with none is left out. */
+export function itemCountLabel({ bugs, features }: ItemCounts): string {
+  return [
+    bugs > 0 ? plural(bugs, 'bug', 'bugs') : null,
+    features > 0 ? plural(features, 'feature', 'features') : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
+export function savedLabel(counts: ItemCounts): string {
+  return `${itemCountLabel(counts)} saved to`;
 }
 
 export function signalCountLabel(count: number): string {
