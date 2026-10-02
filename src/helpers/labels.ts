@@ -1,0 +1,86 @@
+import type { HuntFailure } from './types.js';
+
+/**
+ * Every word the overlay shows. Deliberately not in `messages/`: this is
+ * developer tooling that is never shipped. Held here rather than inline so the
+ * host's `i18next/no-literal-string` rule, which guards `.tsx` files, stays
+ * green without a disable.
+ */
+export const LABELS = {
+  pill: 'bugs',
+  pillTitle: 'Toggle the bug hunt (⌥⇧B)',
+  panelTitle: 'Bug hunt',
+  close: 'Close',
+  mark: 'Mark a bug',
+  markShortcut: '⌥⇧M',
+  picking: 'Click an element, or drag a box. Esc cancels.',
+  capturing: 'Capturing…',
+  save: 'Save',
+  saving: 'Saving…',
+  discardSession: 'Discard session',
+  empty: 'No bugs yet. Mark one on the page.',
+  edit: 'Edit',
+  delete: 'Delete',
+  notePlaceholder: 'What is wrong here? What did you expect?',
+  noteLabel: 'Bug note',
+  noteSave: 'Add',
+  noteUpdate: 'Update',
+  noteCancel: 'Cancel',
+  noteShortcut: '⌘↵',
+  noBoard: 'Save has nowhere to go:',
+  storageWarning:
+    'The browser storage is full: screenshots will not survive a reload until you save.',
+  nextStep: 'Now run this in Claude Code, from this repo:',
+  triageCommand: '/triage-bugs',
+  copy: 'Copy',
+  copied: 'Copied',
+  noScreenshot: 'no image',
+} as const;
+
+export function bugCountLabel(count: number): string {
+  return count === 1 ? '1 bug' : `${count} bugs`;
+}
+
+export function savedLabel(count: number): string {
+  return `${bugCountLabel(count)} saved to`;
+}
+
+export function signalCountLabel(count: number): string {
+  return count === 1 ? '1 error' : `${count} errors`;
+}
+
+const FAILURE_LABELS: Record<HuntFailure, string> = {
+  disabled: 'Saving is off: NEXT_PUBLIC_BUG_HUNT is not true.',
+  invalid: 'The save request was malformed.',
+  noBoard: 'No disposit board to save to:',
+  io: 'The report could not be written. See the dev server log.',
+  noRoute:
+    'Nothing answered the save. Is the route file in place (npx bug-hunt setup)? Tried',
+};
+
+export function failureLabel(reason: HuntFailure, detail?: string): string {
+  return detail
+    ? `${FAILURE_LABELS[reason]} ${detail}`
+    : FAILURE_LABELS[reason];
+}
+
+/** Where the unsaved session lives between reloads, per browser. */
+export const DRAFT_STORAGE_KEY = 'bug-hunt:session';
+
+/** Where the panel remembers whether it was open, per browser. */
+export const OPEN_STORAGE_KEY = 'bug-hunt:open';
+
+/**
+ * The attribute both dev overlays carry. Picking skips anything under it and
+ * the screenshot leaves it out, so an overlay never reports itself.
+ */
+export const DEV_OVERLAY_ATTRIBUTE = 'data-dev-overlay';
+
+/** The shortcuts' physical keys: on a Mac, Option turns `event.key` into a glyph. */
+export const SHORTCUT_CODES = { toggle: 'KeyB', mark: 'KeyM' } as const;
+
+/** How far a press must travel before it is a box rather than a click. */
+export const DRAG_THRESHOLD = 8;
+
+/** Per page, how many console errors and failed requests are kept. */
+export const SIGNAL_LIMIT = 20;

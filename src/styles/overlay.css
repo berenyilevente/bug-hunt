@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * The shadow host starts from nothing: inherited properties (font, colour,
+ * line height, letter spacing) would otherwise flow in from the page.
+ * Preflight's `:host` rule then sets the overlay's own defaults.
+ */
+:host {
+  all: initial;
+}
