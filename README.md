@@ -19,7 +19,7 @@ It expects Next.js App Router (15+), React 19 and a disposit board for the app.
 It needs nothing from the app's Tailwind or CSS.
 
 ```bash
-npm i -D github:berenyilevente/bug-hunt#v0.1.0
+npm i -D github:berenyilevente/bug-hunt#v0.1.1
 npx bug-hunt setup
 ```
 
@@ -139,12 +139,13 @@ npm run typecheck
 npm run build      # dist/: ESM + .d.ts, one file per module, directives kept
 ```
 
-`dist/` is built by `prepare`, so installing from git builds it. To try a
-change in an app before tagging it, `npm pack` here and `npm i -D <tarball>`
-there.
+`dist/` is committed: apps install straight from a git tag, and a committed
+build means the install runs no scripts and pulls none of this repo's dev
+tooling. To try a change in an app before tagging it, `npm pack` here and
+`npm i -D <tarball>` there.
 
-Release: bump `version`, commit, `git tag vX.Y.Z && git push --tags`, then bump
-the tag in each app.
+Release: bump `version`, `npm run build`, commit (with `dist/`),
+`git tag vX.Y.Z && git push --follow-tags`, then bump the tag in each app.
 
 ## Remove it
 

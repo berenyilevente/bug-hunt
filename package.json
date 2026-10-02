@@ -1,6 +1,6 @@
 {
   "name": "@berenyilevente/bug-hunt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A dev overlay for marking bugs on a Next.js page and saving them as a report to a disposit board.",
   "private": true,
   "type": "module",
@@ -25,7 +25,6 @@
   "scripts": {
     "build": "rm -rf dist && npm run build:css && tsc -p tsconfig.build.json",
     "build:css": "tailwindcss -c tailwind.config.cjs -i src/styles/overlay.css -o .css-build/overlay.css --minify && node scripts/embed-css.mjs",
-    "prepare": "npm run build",
     "test": "npm run build:css && vitest run",
     "typecheck": "npm run build:css && tsc --noEmit",
     "format": "prettier --write .",
